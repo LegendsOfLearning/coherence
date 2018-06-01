@@ -1,5 +1,9 @@
 # Coherence Changelog
 
+## LOL 0.5.1
+
+ * Forked for feature enhancment
+
 ## 0.5.0 (2017-08-xx)
 
 * Enhancements
