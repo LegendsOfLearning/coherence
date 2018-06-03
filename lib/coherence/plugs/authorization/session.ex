@@ -313,5 +313,6 @@ defmodule Coherence.Authentication.Session do
     |> put_session("user_return_to",  user_return_to)
     |> Phoenix.Controller.put_flash(:error, "You are not authorized to perform this action.")
     |> Phoenix.Controller.redirect(to: new_session_path(conn, opts[:new_session_params]))
+    |> halt
   end
 end
