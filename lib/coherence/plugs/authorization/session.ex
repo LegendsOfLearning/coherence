@@ -283,6 +283,10 @@ defmodule Coherence.Authentication.Session do
     { conn, nil }
   end
 
+  defp assert_authorize({ %{ halted: true } = conn, _}, _, _) do
+    conn
+  end
+
   defp assert_authorize({conn, _user_data = nil}, _authorize_fn = nil, %{ protected: true } = opts) do
     conn
     |> redirect_to_require_signin(opts)
