@@ -48,11 +48,17 @@ defmodule Coherence.Authentication.Utils do
 
   @spec get_credential_store() :: module
   def get_credential_store do
-    case Config.auth_module do
-      Coherence.Authentication.Session ->
-        Coherence.CredentialStore.Session
-      Coherence.Authentication.Basic ->
-        Coherence.CredentialStore.Server
+    case Config.credential_store do
+      nil ->
+        case Config.auth_module do
+          Coherence.Authentication.Session ->
+            Coherence.CredentialStore.Session
+          Coherence.Authentication.Basic ->
+            Coherence.CredentialStore.Server
+        end
+      store when is_binary(store) -> String.to_existing_atom(store)
+      store when is_atom(store) -> store
+      _ -> nil
     end
   end
 
@@ -86,7 +92,7 @@ defmodule Coherence.Authentication.Utils do
     end
   end
 
-  def new_session_path(conn) do
-    Module.concat(Config.web_module, Router.Helpers).session_path(conn, :new)
+  def new_session_path(conn, opts \\ []) do
+    Module.concat(Config.web_module, Router.Helpers).session_path(conn, :new, opts)
   end
 end

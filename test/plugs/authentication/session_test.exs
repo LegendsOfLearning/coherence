@@ -51,6 +51,34 @@ defmodule CoherenceTest.Plug.Session do
     defp accepts(conn, params), do: Phoenix.Controller.accepts(conn, params)
   end
 
+  defmodule GenerateIdPlug do
+    use Plug.Builder
+    import Plug.Conn
+
+    def call(conn, opts) do
+      conn
+      |> Plug.Conn.assign(:user, opts[:user])
+      |> super(opts)
+    end
+
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_flash
+    plug Coherence.Authentication.Session, login: false, generate_auth_session_id_fn: &GenerateIdPlug.gen_id/3
+    plug :index
+
+    defp index(conn, _opts) do
+      conn
+      |> Coherence.Authentication.Session.create_login(conn.assigns[:user])
+      |> send_resp(200, "Authorized")
+    end
+    defp fetch_flash(conn, params), do: Phoenix.Controller.fetch_flash(conn, params)
+    defp accepts(conn, params), do: Phoenix.Controller.accepts(conn, params)
+    def gen_id(_conn, _user_data, _opts) do
+      "1"
+    end
+  end
+
 
   defp call(plug, headers) do
     conn(:get, "/", headers: headers)
@@ -115,6 +143,15 @@ defmodule CoherenceTest.Plug.Session do
       list = Ecto.Query.where(Rememberable, [u], u.user_id == ^id)
       |> TestCoherence.Repo.all
       assert list == []
+    end
+    test "allows for custom auth session id generation", meta do
+      conn = conn(:get, "/", headers: [])
+      |> sign_conn
+      |> GenerateIdPlug.call([user: meta[:user]])
+      assert conn.status == 200
+      assert conn.resp_body == "Authorized"
+      creds = get_session(conn, "session_auth")
+      assert creds == "1"
     end
     test "uses session over remember me", meta do
       conn = conn(:get, "/", headers: [])

@@ -23,6 +23,7 @@ defmodule Coherence.Config do
   * :email_reply_to_email
   * :site_name                                        - The site name used for email
   * :login_cookie ("coherence_login")                 - The name of the login cookie
+  * :credential_store                                 - @behaviour Coherence.CredentialStore
   * :auth_module (Coherence.Authentication.Session)
   * :create_login (:create_login)
   * :uppdate_login (:update_login)
@@ -95,6 +96,7 @@ defmodule Coherence.Config do
     {:password_hash_field, :password_hash},
     {:login_field, :email},
     {:login_cookie, "coherence_login"},
+    {:credential_store, nil },
     {:auth_module, Coherence.Authentication.Session},
     {:create_login, :create_login},
     {:update_login, :update_login},

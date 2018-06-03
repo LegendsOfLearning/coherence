@@ -102,9 +102,14 @@ defmodule Coherence.Authentication.Session do
   """
   @spec create_login(conn, t, Keyword.t) :: conn
   def create_login(conn, user_data, opts  \\ []) do
+    if is_nil(conn.assigns[:auth_session_plug_opts]) do
+      Logger.warn "Coherence.Authentication.Session plug was not added to this pipeline.  Options provided in router will not be available"
+    end
+    opts = Keyword.merge(opts, Map.to_list(conn.assigns[:auth_session_plug_opts] || %{}))
     id_key = Keyword.get(opts, :id_key, :id)
     store = Keyword.get(opts, :store, Coherence.CredentialStore.Session)
-    id = UUID.uuid1
+    generate_auth_session_id_fn = Keyword.get(opts, :generate_auth_session_id_fn, &generate_id_as_uuid/3)
+    id = generate_auth_session_id_fn.(conn, user_data, opts)
 
     store.put_credentials({id, user_data, id_key})
     put_session(conn, @session_key, id)
@@ -183,6 +188,9 @@ defmodule Coherence.Authentication.Session do
 
     %{
       login: login,
+      protected: opts[:protected] || false,
+      new_session_params: opts[:new_session_params] || %{},
+      authorize: Keyword.get(opts, :authorize),
       error: Keyword.get(opts, :error, "HTTP Authentication Required"),
       db_model: Keyword.get(opts, :db_model),
       id_key: Keyword.get(opts, :id, :id),
@@ -191,21 +199,31 @@ defmodule Coherence.Authentication.Session do
       login_key: Keyword.get(opts, :login_cookie, Config.login_cookie),
       rememberable: Keyword.get(opts, :rememberable, rememberable?),
       cookie_expire: Keyword.get(opts, :login_cookie_expire_hours, Config.rememberable_cookie_expire_hours) * 60 * 60,
-      rememberable_callback: Keyword.get(opts, :rememberable_callback)
+      rememberable_callback: Keyword.get(opts, :rememberable_callback),
+      generate_auth_session_id_fn: Keyword.get(opts, :generate_auth_session_id_fn, &Coherence.Authentication.Session.generate_id_as_uuid/3)
     }
+  end
+
+  def generate_id_as_uuid(_conn, _user_data, _opt) do
+    UUID.uuid1
   end
 
   @doc false
   @spec call(conn, Keyword.t) :: conn
   def call(conn, opts) do
-    if get_authenticated_user(conn) do
-      conn
+    conn = conn
+      |> assign(:auth_session_plug_opts, opts)
+
+    if user = get_authenticated_user(conn) do
+      { conn, user }
+      |> assert_authorize(opts[:authorize], opts)
     else
       conn
       |> get_session_data
       |> verify_auth_key(opts, opts[:store])
       |> verify_rememberable(opts)
       |> assert_login(opts[:login], opts)
+      |> assert_authorize(opts[:authorize], opts)
     end
   end
 
@@ -233,26 +251,57 @@ defmodule Coherence.Authentication.Session do
   defp verify_auth_key({conn, auth_key}, %{db_model: db_model, id_key: id_key}, store),
     do: {conn, store.get_user_data({auth_key, db_model, id_key})}
 
-  defp assert_login({conn, nil}, login, _opts) when login == true or is_function(login) do
+  defp assert_login({conn, no_userdata = nil}, login, _opts) when login == true or is_function(login) do
     user_return_to =
       case conn.query_string do
         "" -> conn.request_path
         _ -> conn.request_path <> "?" <> conn.query_string
       end
-    conn =  put_session(conn, "user_return_to",  user_return_to)
-    if login == true do
+    conn = put_session(conn, "user_return_to",  user_return_to)
+    conn = if login == true do
       Phoenix.Controller.redirect conn, to: new_session_path(conn)
     else
       login.(conn)
     end
-    |> halt
+    { conn |> halt, no_userdata }
   end
 
   defp assert_login({conn, user_data}, _, opts) do
     assign_key = opts[:assigns_key]
-    conn
+    conn = conn
     |> assign_user_data(user_data, assign_key)
     |> create_user_token(user_data, Config.user_token, assign_key)
+    { conn, user_data }
   end
-  defp assert_login(conn, _, _), do: conn
+  defp assert_login(conn, _, _) do
+    { conn, nil }
+  end
+
+  defp assert_authorize({conn, _user_data = nil}, _authorize_fn = nil, %{ protected: true } = opts) do
+    conn
+    |> redirect_to_require_signin(opts)
+  end
+
+  defp assert_authorize({conn, _user_data}, _authorize_fn = nil, _opts) do
+    conn
+  end
+
+  defp assert_authorize({conn, user_data}, authorize_fn, opts) when is_function(authorize_fn) do
+    case authorize_fn.({conn, user_data}, opts) do
+      { conn, _authorized = true } -> conn
+      { conn, _ } -> conn |> redirect_to_require_signin(opts)
+    end
+  end
+
+  defp redirect_to_require_signin(conn, opts) do
+    user_return_to =
+    case conn.query_string do
+      "" -> conn.request_path
+      _ -> conn.request_path <> "?" <> conn.query_string
+    end
+    conn
+    |> put_session("user_return_to",  user_return_to)
+    |> Phoenix.Controller.put_flash(:error, "You are not authorized to perform this action.")
+    |> Phoenix.Controller.redirect(to: new_session_path(conn, opts[:new_session_params]))
+  end
 end
