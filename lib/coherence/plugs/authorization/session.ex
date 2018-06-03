@@ -97,6 +97,12 @@ defmodule Coherence.Authentication.Session do
     {:nowarn_function, init: 1},
   ]
 
+  def login_user(conn, user, params \\ %{}) do
+    conn
+    |> create_login(user, params)
+    |> Coherence.TrackableService.track_login(user, Config.user_schema.trackable?, Config.user_schema.trackable_table?)
+  end
+
   @doc """
     Create a login for a user. `user_data` can be any term but must not be `nil`.
   """
