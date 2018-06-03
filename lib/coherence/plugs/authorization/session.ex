@@ -257,7 +257,7 @@ defmodule Coherence.Authentication.Session do
   defp verify_auth_key({conn, auth_key}, %{db_model: db_model, id_key: id_key}, store),
     do: {conn, store.get_user_data({auth_key, db_model, id_key})}
 
-  defp assert_login({conn, no_userdata = nil}, login, _opts) when login == true or is_function(login) do
+  defp assert_login({conn, no_userdata = nil}, login, opts) when login == true or is_function(login) do
     user_return_to =
       case conn.query_string do
         "" -> conn.request_path
@@ -265,7 +265,7 @@ defmodule Coherence.Authentication.Session do
       end
     conn = put_session(conn, "user_return_to",  user_return_to)
     conn = if login == true do
-      Phoenix.Controller.redirect conn, to: new_session_path(conn)
+      Phoenix.Controller.redirect conn, to: new_session_path(conn, opts[:new_session_params])
     else
       login.(conn)
     end
