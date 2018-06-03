@@ -8,3 +8,8 @@ config :coherence, Coherence.Mailer,
 
 import_config "#{Mix.env}.exs"
 
+# Allow for additional overrides.
+# Eg. `test.more.exs`
+# Note `*.secret.exs` has been added to .gitignore
+# so `test.secret.exs` will not be checked in
+import_config "#{Mix.env}*.exs"

@@ -50,70 +50,95 @@ defmodule Coherence.CredentialStore.Server do
   ###################
   # Callbacks
 
-  @doc false
-  def init(_) do
-    {:ok, initial_state()}
-  end
+  defimpl Coherence.ServerStore, for: Any do
+    require Logger
 
-  @doc false
-  def handle_call({:get_user_data, credentials}, _from, state) do
-    id = state.store[credentials]
-    user_data =
-      case state.user_data[id] do
-        nil -> nil
-        {user_data, _} -> user_data
-      end
-    {:reply, user_data, state}
-  end
+    def init(_opts) do
+      {:ok, initial_state()}
+    end
 
-  @doc false
-  def handle_cast({:put_credentials, credentials, %{id: id} = user_data}, state) do
-    state =
-      update_in(state, [:user_data, id], fn
-        nil              -> {user_data, 1}
-        {_, cnt} -> {user_data, cnt + 1}
+    def stop(state) do
+      {:stop, :normal, state}
+    end
+
+    def get_user_data(credentials, _from, state) do
+      id = state.store[credentials]
+      user_data =
+        case state.user_data[id] do
+          nil -> nil
+          {user_data, _} -> user_data
+        end
+      {:reply, user_data, state}
+    end
+
+    def put_credentials(credentials, %{id: id} = user_data, state) do
+      state =
+        update_in(state, [:user_data, id], fn
+          nil              -> {user_data, 1}
+          {_, cnt} -> {user_data, cnt + 1}
+        end)
+        |> put_in([:store, credentials], id)
+      {:noreply, state}
+    end
+
+    def put_credentials(_credentials, _user_data, state) do
+      {:noreply, state}
+    end
+
+    def delete_credentials(credentials, state) do
+      id = state.store[credentials]
+      state =
+        state
+        |> update_in([:store], &Map.delete(&1, credentials))
+        |> update_in([:user_data, id], fn
+          {_, 1} -> nil
+          {user_data, inx} -> {user_data, inx - 1}
+        end)
+      {:noreply, state}
+    end
+
+    def update_user_logins(%{id: id} = user_data, state) do
+      # TODO:
+      # Maybe support updating ths user's ID.
+      state = update_in(state, [:user_data, id], fn {_, inx} ->
+        {user_data, inx}
       end)
-      |> put_in([:store, credentials], id)
-    {:noreply, state}
-  end
+      {:noreply, state}
+    end
 
-  def handle_cast({:put_credentials, _credentials, _user_data}, state) do
-    {:noreply, state}
+    ##################
+    # Private
+
+    defp initial_state, do: %{store: %{}, user_data: %{}}
   end
 
   @doc false
-  def handle_cast({:update_user_logins, %{id: id} = user_data}, state) do
-    # TODO:
-    # Maybe support updating ths user's ID.
-    state = update_in(state, [:user_data, id], fn {_, inx} ->
-      {user_data, inx}
-    end)
-    {:noreply, state}
+  def init(opts) do
+    Coherence.ServerStore.init(opts)
+  end
 
+  @doc false
+  def handle_call({:get_user_data, credentials}, caller, state) do
+    Coherence.ServerStore.get_user_data(credentials, caller, state)
+  end
+
+  @doc false
+  def handle_cast({:put_credentials, credentials, user_data}, state) do
+    Coherence.ServerStore.put_credentials(credentials, user_data, state)
+  end
+
+  @doc false
+  def handle_cast({:update_user_logins, user_data}, state) do
+    Coherence.ServerStore.update_user_logins(user_data, state)
   end
 
   @doc false
   def handle_cast({:delete_credentials, credentials}, state) do
-    id = state.store[credentials]
-    state =
-      state
-      |> update_in([:store], &Map.delete(&1, credentials))
-      |> update_in([:user_data, id], fn
-        {_, 1} -> nil
-        {user_data, inx} -> {user_data, inx - 1}
-      end)
-    {:noreply, state}
-
+    Coherence.ServerStore.delete_credentials(credentials, state)
   end
 
   @doc false
   def handle_cast(:stop, state) do
-    {:stop, :normal, state}
+    Coherence.ServerStore.stop(state)
   end
-
-  ##################
-  # Private
-
-  defp initial_state, do: %{store: %{}, user_data: %{}}
-
 end
