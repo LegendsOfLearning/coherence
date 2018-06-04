@@ -119,7 +119,7 @@ defmodule Coherence.Authentication.Session do
 
     store.put_credentials({id, user_data, id_key})
 
-    update_conn_callback = Keyword.get(opts, :update_conn_callback, &Coherence.Authentication.Session.update_conn/2)
+    update_conn_callback = Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
 
     conn
     |> put_session(@session_key, id)
@@ -135,7 +135,7 @@ defmodule Coherence.Authentication.Session do
     store = Keyword.get(opts, :store, Coherence.CredentialStore.Session)
     id = get_session(conn, @session_key)
 
-    update_conn_callback = Keyword.get(opts, :update_conn_callback, &Coherence.Authentication.Session.update_conn/2)
+    update_conn_callback = Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
 
     store.put_credentials({id, user_data, id_key})
     conn
