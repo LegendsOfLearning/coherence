@@ -28,35 +28,29 @@ defmodule Coherence.ServerStore do
     | {:ok, state :: gen_state, timeout() | :hibernate}
     | :ignore
     | {:stop, reason :: any()}
-  # def init(opts)
 
   @doc """
   Called on GenServer stop
   """
   @callback stop(state :: gen_state) :: cast_return
-  # def stop(state)
 
   @doc """
   Get authenticated user data.
   """
   @callback get_user_data(HashDict.t, GenServer.from(), gen_state) :: call_return
-  # def get_user_data(credentials, caller, state)
 
   @doc """
   Save authenticated user data in the database.
   """
   @callback put_credentials(schema, HashDict.t, gen_state) :: cast_return
-  # def put_credentials(resource, credentials, state)
 
   @doc """
   Delete current user credentials.
   """
   @callback delete_credentials(HashDict.t, gen_state) :: cast_return
-  # def delete_credentials(credentials, state)
 
   @doc """
   """
   @callback update_user_logins(schema, gen_state) :: cast_return
-  # def update_user_logins(resource, state)
 end
 

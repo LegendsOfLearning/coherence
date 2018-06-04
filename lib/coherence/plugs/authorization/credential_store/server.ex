@@ -63,35 +63,30 @@ defmodule Coherence.CredentialStore.Server do
   def handle_call({:get_user_data, credentials}, caller, state) do
     Config.server_store()
     |> apply(:get_user_data, [credentials, caller, state])
-    # Coherence.ServerStore.get_user_data(credentials, caller, state)
   end
 
   @doc false
   def handle_cast({:put_credentials, credentials, user_data}, state) do
     Config.server_store()
     |> apply(:put_credentials, [credentials, user_data, state])
-    # Coherence.ServerStore.put_credentials(credentials, user_data, state)
   end
 
   @doc false
   def handle_cast({:update_user_logins, user_data}, state) do
     Config.server_store()
     |> apply(:update_user_logins, [user_data, state])
-    # Coherence.ServerStore.update_user_logins(user_data, state)
   end
 
   @doc false
   def handle_cast({:delete_credentials, credentials}, state) do
     Config.server_store()
     |> apply(:delete_credentials, [credentials, state])
-    # Coherence.ServerStore.delete_credentials(credentials, state)
   end
 
   @doc false
   def handle_cast(:stop, state) do
     Config.server_store()
     |> apply(:stop, [state])
-    # Coherence.ServerStore.stop(state)
   end
 end
 

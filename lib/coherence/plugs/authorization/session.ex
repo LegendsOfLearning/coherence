@@ -118,7 +118,10 @@ defmodule Coherence.Authentication.Session do
     id = generate_auth_session_id_fn.(conn, user_data, opts)
 
     store.put_credentials({id, user_data, id_key})
-    put_session(conn, @session_key, id)
+
+    conn
+    |> put_session(@session_key, id)
+    |> Config.update_conn_callback.(id)
   end
 
   @doc """
@@ -132,6 +135,7 @@ defmodule Coherence.Authentication.Session do
 
     store.put_credentials({id, user_data, id_key})
     conn
+    |> Config.update_conn_callback.(id)
   end
 
   @doc """
@@ -147,11 +151,15 @@ defmodule Coherence.Authentication.Session do
         store.delete_credentials(key)
 
         conn
-        |> put_session(@session_key, nil)
-        |> put_session("user_return_to", nil)
+        |> clear_session()
     end
     |> delete_token_session
     |> delete_user_token
+  end
+
+  @spec update_conn(conn, String.t) :: conn
+  def update_conn(conn, id) do
+    conn
   end
 
   # defp default_login_callback do
