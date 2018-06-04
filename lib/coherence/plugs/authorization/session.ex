@@ -115,7 +115,7 @@ defmodule Coherence.Authentication.Session do
     id_key = Keyword.get(opts, :id_key, :id)
     store = Keyword.get(opts, :store, Coherence.CredentialStore.Session)
     generate_auth_session_id_callback = Keyword.get(opts, :generate_auth_session_id_callback, &Coherence.Authentication.Session.generate_id_as_uuid/3)
-    id = generate_auth_session_id_callback.(conn, user_data, opts)
+    { conn, id } = generate_auth_session_id_callback.(conn, user_data, opts)
 
     store.put_credentials({id, user_data, id_key})
 
@@ -224,8 +224,8 @@ defmodule Coherence.Authentication.Session do
     }
   end
 
-  def generate_id_as_uuid(_conn, _user_data, _opt) do
-    UUID.uuid1
+  def generate_id_as_uuid(conn, _user_data, _opt) do
+    { conn, UUID.uuid1 }
   end
 
   @doc false

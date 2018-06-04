@@ -74,8 +74,8 @@ defmodule CoherenceTest.Plug.Session do
     end
     defp fetch_flash(conn, params), do: Phoenix.Controller.fetch_flash(conn, params)
     defp accepts(conn, params), do: Phoenix.Controller.accepts(conn, params)
-    def gen_id(_conn, _user_data, _opts) do
-      "1"
+    def gen_id(conn, _user_data, _opts) do
+      { conn, "1" }
     end
   end
 
