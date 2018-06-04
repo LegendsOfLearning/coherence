@@ -122,8 +122,8 @@ defmodule Coherence.Authentication.Session do
     update_conn_callback = Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
 
     conn
-    |> put_session(@session_key, id)
     |> update_conn_callback.(id)
+    |> put_session(@session_key, id)
   end
 
   @doc """
