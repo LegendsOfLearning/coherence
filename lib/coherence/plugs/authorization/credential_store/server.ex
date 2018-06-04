@@ -103,6 +103,7 @@ defmodule Coherence.ServerStoreImpl do
   end
 
   def get_user_data(credentials, _from, state) do
+    IO.inspect "SERVER - get_user_data"
     id = state.store[credentials]
     user_data =
       case state.user_data[id] do
@@ -113,6 +114,7 @@ defmodule Coherence.ServerStoreImpl do
   end
 
   def put_credentials(credentials, %{id: id} = user_data, state) do
+    IO.inspect "SERVER - put_credentials"
     state =
       update_in(state, [:user_data, id], fn
         nil              -> {user_data, 1}
@@ -123,10 +125,12 @@ defmodule Coherence.ServerStoreImpl do
   end
 
   def put_credentials(_credentials, _user_data, state) do
+    IO.inspect "SERVER - put_credentials"
     {:noreply, state}
   end
 
   def delete_credentials(credentials, state) do
+    IO.inspect "SERVER - delete_credentials"
     id = state.store[credentials]
     state =
       state
@@ -139,6 +143,7 @@ defmodule Coherence.ServerStoreImpl do
   end
 
   def update_user_logins(%{id: id} = user_data, state) do
+    IO.inspect "SERVER - update_user_logins"
     # TODO:
     # Maybe support updating ths user's ID.
     state = update_in(state, [:user_data, id], fn {_, inx} ->
