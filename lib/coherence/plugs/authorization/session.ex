@@ -114,8 +114,8 @@ defmodule Coherence.Authentication.Session do
     opts = Keyword.merge(opts, Map.to_list(conn.assigns[:auth_session_plug_opts] || %{}))
     id_key = Keyword.get(opts, :id_key, :id)
     store = Keyword.get(opts, :store, Coherence.CredentialStore.Session)
-    generate_auth_session_id_fn = Keyword.get(opts, :generate_auth_session_id_fn, &Coherence.Authentication.Session.generate_id_as_uuid/3)
-    id = generate_auth_session_id_fn.(conn, user_data, opts)
+    generate_auth_session_id_callback = Keyword.get(opts, :generate_auth_session_id_callback, &Coherence.Authentication.Session.generate_id_as_uuid/3)
+    id = generate_auth_session_id_callback.(conn, user_data, opts)
 
     store.put_credentials({id, user_data, id_key})
 
@@ -219,8 +219,8 @@ defmodule Coherence.Authentication.Session do
       rememberable: Keyword.get(opts, :rememberable, rememberable?),
       cookie_expire: Keyword.get(opts, :login_cookie_expire_hours, Config.rememberable_cookie_expire_hours) * 60 * 60,
       rememberable_callback: Keyword.get(opts, :rememberable_callback),
-      generate_auth_session_id_fn: Keyword.get(opts, :generate_auth_session_id_fn, &Coherence.Authentication.Session.generate_id_as_uuid/3),
-      update_conn_callback: Keyword.get(opts, :update_conn_callback, &Coherence.Authentication.Session.update_conn/2)
+      generate_auth_session_id_callback: Keyword.get(opts, :generate_auth_session_id_callback, Config.generate_auth_session_id_callback),
+      update_conn_callback: Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
     }
   end
 
