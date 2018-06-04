@@ -42,15 +42,15 @@ defmodule Coherence.ServerStore do
   @doc """
   Save authenticated user data in the database.
   """
-  @callback put_credentials(schema, HashDict.t, gen_state) :: cast_return
+  @callback put_credentials(schema, HashDict.t, gen_state) :: call_return
 
   @doc """
   Delete current user credentials.
   """
-  @callback delete_credentials(HashDict.t, gen_state) :: cast_return
+  @callback delete_credentials(HashDict.t, gen_state) :: call_return
 
   @doc """
   """
-  @callback update_user_logins(schema, gen_state) :: cast_return
+  @callback update_user_logins(schema, gen_state) :: call_return
 end
 

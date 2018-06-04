@@ -22,7 +22,7 @@ defmodule Coherence.CredentialStore.Server do
 
   @spec update_user_logins(T.user_data) :: no_return
   def update_user_logins(%{id: _} = user_data) do
-    GenServer.cast @name, {:update_user_logins, user_data}
+    GenServer.call @name, {:update_user_logins, user_data}
   end
     # If the user_data doesn't contain an ID, there are no sessions belonging to the user
     # There is no need to update anything and we just return an empty list
@@ -35,12 +35,12 @@ defmodule Coherence.CredentialStore.Server do
 
   @spec put_credentials(T.credentials, T.user_data) :: no_return
   def put_credentials(credentials, user_data) do
-    GenServer.cast @name, {:put_credentials, credentials, user_data}
+    GenServer.call @name, {:put_credentials, credentials, user_data}
   end
 
   @spec delete_credentials(T.credentials) :: no_return
   def delete_credentials(credentials) do
-    GenServer.cast @name, {:delete_credentials, credentials}
+    GenServer.call @name, {:delete_credentials, credentials}
   end
 
   @spec stop() :: no_return
@@ -56,7 +56,6 @@ defmodule Coherence.CredentialStore.Server do
   def init(opts) do
     Config.server_store()
     |> apply(:init, [opts])
-    # Coherence.ServerStore.init(opts)
   end
 
   @doc false
@@ -66,19 +65,19 @@ defmodule Coherence.CredentialStore.Server do
   end
 
   @doc false
-  def handle_cast({:put_credentials, credentials, user_data}, state) do
+  def handle_call({:put_credentials, credentials, user_data}, _caller, state) do
     Config.server_store()
     |> apply(:put_credentials, [credentials, user_data, state])
   end
 
   @doc false
-  def handle_cast({:update_user_logins, user_data}, state) do
+  def handle_call({:update_user_logins, user_data}, _caller, state) do
     Config.server_store()
     |> apply(:update_user_logins, [user_data, state])
   end
 
   @doc false
-  def handle_cast({:delete_credentials, credentials}, state) do
+  def handle_call({:delete_credentials, credentials}, _caller, state) do
     Config.server_store()
     |> apply(:delete_credentials, [credentials, state])
   end
@@ -121,12 +120,12 @@ defmodule Coherence.ServerStoreImpl do
         {_, cnt} -> {user_data, cnt + 1}
       end)
       |> put_in([:store, credentials], id)
-    {:noreply, state}
+    {:reply, user_data, state}
   end
 
   def put_credentials(_credentials, _user_data, state) do
     IO.inspect "SERVER - put_credentials"
-    {:noreply, state}
+    {:reply, nil, state}
   end
 
   def delete_credentials(credentials, state) do
@@ -139,7 +138,7 @@ defmodule Coherence.ServerStoreImpl do
         {_, 1} -> nil
         {user_data, inx} -> {user_data, inx - 1}
       end)
-    {:noreply, state}
+    {:reply, id, state}
   end
 
   def update_user_logins(%{id: id} = user_data, state) do
@@ -149,7 +148,7 @@ defmodule Coherence.ServerStoreImpl do
     state = update_in(state, [:user_data, id], fn {_, inx} ->
       {user_data, inx}
     end)
-    {:noreply, state}
+    {:reply, :done, state}
   end
 
   ##################

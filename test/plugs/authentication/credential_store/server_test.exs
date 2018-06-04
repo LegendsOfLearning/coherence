@@ -89,14 +89,14 @@ defmodule Coherence.CredentialStore.Server.Test do
   defp uuid, do: UUID.uuid1
 
   defp put_credentials(state, credentials, user_data) do
-    {:noreply, state1} =
-      Server.handle_cast({:put_credentials, credentials, user_data}, state)
+    {:reply, user_data, state1} =
+      Server.handle_call({:put_credentials, credentials, user_data}, nil, state)
     state1
   end
 
   defp delete_credentials(state, credentials) do
-    {:noreply, state1} =
-      Server.handle_cast({:delete_credentials, credentials}, state)
+    {:reply, credentials, state1} =
+      Server.handle_call({:delete_credentials, credentials}, nil, state)
     state1
   end
 
@@ -107,8 +107,8 @@ defmodule Coherence.CredentialStore.Server.Test do
   end
 
   defp update_user_logins(state, user_data) do
-    {:noreply, state1} =
-      Server.handle_cast({:update_user_logins, user_data}, state)
+    {:reply, :done, state1} =
+      Server.handle_call({:update_user_logins, user_data}, nil, state)
     state1
   end
 
