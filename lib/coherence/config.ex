@@ -24,7 +24,6 @@ defmodule Coherence.Config do
   * :site_name                                        - The site name used for email
   * :login_cookie ("coherence_login")                 - The name of the login cookie
   * :server_store (Coherence.ServerStoreImpl)         - @behaviour Coherence.ServerStore
-  * :update_conn_callback (noop)                      - fn(conn, id) :: conn
   * :auth_module (Coherence.Authentication.Session)
   * :create_login (:create_login)
   * :uppdate_login (:update_login)
@@ -98,7 +97,6 @@ defmodule Coherence.Config do
     {:login_field, :email},
     {:login_cookie, "coherence_login"},
     {:server_store, Coherence.ServerStoreImpl },
-    {:update_conn_callback, &Coherence.Authentication.Session.update_conn/2 },
     {:auth_module, Coherence.Authentication.Session},
     {:create_login, :create_login},
     {:update_login, :update_login},
