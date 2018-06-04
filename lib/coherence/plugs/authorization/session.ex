@@ -159,6 +159,7 @@ defmodule Coherence.Authentication.Session do
 
   @spec update_conn(conn, String.t) :: conn
   def update_conn(conn, id) do
+    IO.inspect "DEFAULT UPDATE_CONN! #{id}"
     conn
   end
 
