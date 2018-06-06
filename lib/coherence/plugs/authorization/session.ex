@@ -114,15 +114,14 @@ defmodule Coherence.Authentication.Session do
     opts = Keyword.merge(opts, Map.to_list(conn.assigns[:auth_session_plug_opts] || %{}))
     id_key = Keyword.get(opts, :id_key, :id)
     store = Keyword.get(opts, :store, Coherence.CredentialStore.Session)
-    generate_auth_session_id_callback = Keyword.get(opts, :generate_auth_session_id_callback, &Coherence.Authentication.Session.generate_id_as_uuid/3)
-    { conn, id } = generate_auth_session_id_callback.(conn, user_data, opts)
+    { gen_callback_mod, gen_callback_fn } = Keyword.get(opts, :generate_auth_session_id_callback, { Coherence.Authentication.Session, :generate_id_as_uuid })
+    { conn, id } = apply(gen_callback_mod, gen_callback_fn, [ conn, user_data, opts ])
 
     store.put_credentials({id, user_data, id_key})
 
-    update_conn_callback = Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
+    { update_callback_mod, update_callback_fn } = Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
 
-    conn
-    |> update_conn_callback.(id)
+    apply(update_callback_mod, update_callback_fn, [conn, id])
     |> put_session(@session_key, id)
   end
 
@@ -135,11 +134,10 @@ defmodule Coherence.Authentication.Session do
     store = Keyword.get(opts, :store, Coherence.CredentialStore.Session)
     id = get_session(conn, @session_key)
 
-    update_conn_callback = Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
+    { update_callback_mod, update_callback_fn } = Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
 
     store.put_credentials({id, user_data, id_key})
-    conn
-    |> update_conn_callback.(id)
+    apply(update_callback_mod, update_callback_fn, [conn, id])
   end
 
   @doc """
@@ -162,8 +160,7 @@ defmodule Coherence.Authentication.Session do
   end
 
   @spec update_conn(conn, String.t) :: conn
-  def update_conn(conn, id) do
-    IO.inspect "DEFAULT UPDATE_CONN! #{id}"
+  def update_conn(conn, _id) do
     conn
   end
 

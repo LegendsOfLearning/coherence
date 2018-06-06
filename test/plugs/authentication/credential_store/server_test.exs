@@ -89,13 +89,13 @@ defmodule Coherence.CredentialStore.Server.Test do
   defp uuid, do: UUID.uuid1
 
   defp put_credentials(state, credentials, user_data) do
-    {:reply, user_data, state1} =
+    {:reply, _user_data, state1} =
       Server.handle_call({:put_credentials, credentials, user_data}, nil, state)
     state1
   end
 
   defp delete_credentials(state, credentials) do
-    {:reply, credentials, state1} =
+    {:reply, _credentials, state1} =
       Server.handle_call({:delete_credentials, credentials}, nil, state)
     state1
   end

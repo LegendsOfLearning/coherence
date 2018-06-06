@@ -64,7 +64,7 @@ defmodule CoherenceTest.Plug.Session do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
-    plug Coherence.Authentication.Session, login: false, generate_auth_session_id_callback: &GenerateIdPlug.gen_id/3
+    plug Coherence.Authentication.Session, login: false, generate_auth_session_id_callback: { GenerateIdPlug, :gen_id }
     plug :index
 
     defp index(conn, _opts) do
