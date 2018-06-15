@@ -26,6 +26,7 @@ defmodule Coherence.Messages do
   @callback invalid_request() :: binary
   @callback invalid_confirmation_token() :: binary
   @callback invalid_email_or_password() :: binary
+  @callback not_authorized_to_perform() :: binary
   @callback invalid_invitation_token() :: binary
   @callback invalid_reset_token() :: binary
   @callback invalid_unlock_token() :: binary

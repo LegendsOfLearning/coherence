@@ -79,7 +79,7 @@ defmodule Coherence.Authentication.Session do
   import Plug.Conn
   import Coherence.Authentication.Utils
 
-  alias Coherence.{Config}
+  alias Coherence.{Config, Messages}
 
   require Logger
 
@@ -216,6 +216,7 @@ defmodule Coherence.Authentication.Session do
       rememberable: Keyword.get(opts, :rememberable, rememberable?),
       cookie_expire: Keyword.get(opts, :login_cookie_expire_hours, Config.rememberable_cookie_expire_hours) * 60 * 60,
       rememberable_callback: Keyword.get(opts, :rememberable_callback),
+      not_authorized_message: opts[:not_authorized_message] || Messages.backend().not_authorized_to_perform(),
       generate_auth_session_id_callback: Keyword.get(opts, :generate_auth_session_id_callback, Config.generate_auth_session_id_callback),
       update_conn_callback: Keyword.get(opts, :update_conn_callback, Config.update_conn_callback)
     }
@@ -322,7 +323,7 @@ defmodule Coherence.Authentication.Session do
     end
     conn
     |> put_session("user_return_to",  user_return_to)
-    |> Phoenix.Controller.put_flash(:error, "You are not authorized to perform this action.")
+    |> Phoenix.Controller.put_flash(:error, opts[:not_authorized_message])
     |> Phoenix.Controller.redirect(to: new_session_path(conn, opts[:new_session_params]))
     |> halt
   end

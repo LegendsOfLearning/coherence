@@ -40,6 +40,7 @@ defmodule <%= web_base %>.Coherence.Messages do
   def invalid_request, do: dgettext(@domain, "Invalid Request.")
   def invalid_confirmation_token, do: dgettext(@domain, "Invalid confirmation token.")
   def invalid_email_or_password, do: dgettext(@domain, "Invalid email or password.")
+  def not_authorized_to_perform, do: dgettext(@domain, "You are not authorized to perform this action.")
   def invalid_invitation_token, do: dgettext(@domain, "Invalid invitation token.")
   def invalid_reset_token, do: dgettext(@domain, "Invalid reset token.")
   def invalid_unlock_token, do: dgettext(@domain, "Invalid unlock token.")
