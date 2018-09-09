@@ -170,7 +170,7 @@ defmodule <%= web_base %>.Coherence.SessionController do
           conn
           |> assign(:locked, true)
           |> track_lock(user, user.__struct__.trackable_table?())
-        {new_conn, Messages.backend().maximum_login_attempts_exceeded(), %{locked_at: Ecto.DateTime.utc()}}
+        {new_conn, Messages.backend().maximum_login_attempts_exceeded(), %{locked_at: Timex.now()}}
       else
         {conn, Messages.backend().incorrect_login_or_password(login_field: Config.login_field()), %{}}
       end

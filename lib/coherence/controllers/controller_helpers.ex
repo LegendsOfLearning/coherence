@@ -130,8 +130,6 @@ defmodule Coherence.ControllerHelpers do
   @spec shift(struct, Keyword.t) :: struct
   def shift(datetime, opts) do
     datetime
-    |> Ecto.DateTime.to_erl
-    |> Timex.to_datetime
     |> Timex.shift(opts)
   end
 
@@ -174,7 +172,7 @@ defmodule Coherence.ControllerHelpers do
       token = random_string 48
       url = router_helpers().confirmation_url(conn, :edit, token)
       Logger.debug "confirmation email url: #{inspect url}"
-      dt = Ecto.DateTime.utc
+      dt = Timex.now()
       user
       |> user_schema.changeset(%{confirmation_token: token,
         confirmation_sent_at: dt,
@@ -222,7 +220,7 @@ defmodule Coherence.ControllerHelpers do
   can set this data far in the future to do a pseudo permanent lock.
   """
   @spec lock!(Ecto.Schema.t, struct) :: schema_or_error
-  def lock!(user, locked_at \\ Ecto.DateTime.utc) do
+  def lock!(user, locked_at \\ Timex.now()) do
     user_schema = Config.user_schema
     changeset = user_schema.lock user, locked_at
     if user_schema.locked?(user) do

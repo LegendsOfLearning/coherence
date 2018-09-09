@@ -28,7 +28,7 @@ defmodule Coherence.PasswordService do
   """
   def reset_password_token(user) do
     token = Helpers.random_string 48
-    dt = Ecto.DateTime.utc
+    dt = Timex.now()
     :password
     |> Helpers.changeset(user.__struct__, user,
       %{reset_password_token: token, reset_password_sent_at: dt})
