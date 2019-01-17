@@ -46,7 +46,7 @@ defmodule CoherenceTest.PasswordController do
 
     test "valid token has expired", %{conn: conn} do
       token = random_string 48
-      {:ok, sent_at} = Timex.to_datetime({{2016, 01, 01}, {0, 0, 0}}, :local)
+      sent_at = Timex.to_datetime({{2016, 01, 01}, {0, 0, 0}}, :local)
       insert_user(%{reset_password_sent_at: sent_at, reset_password_token: token})
       params = %{"id" => token}
       conn = get conn, password_path(conn, :edit, token), params
@@ -92,7 +92,7 @@ defmodule CoherenceTest.PasswordController do
     end
 
     test "valid token has expired, reset token gets removed", %{conn: conn} do
-      {:ok, sent_at} = Timex.to_datetime({{2016, 01, 01}, {0, 0, 0}}, :local)
+      sent_at = Timex.to_datetime({{2016, 01, 01}, {0, 0, 0}}, :local)
       token = random_string 48
       user = insert_user(%{reset_password_sent_at: sent_at, reset_password_token: token})
       old_password_hash = user.password_hash

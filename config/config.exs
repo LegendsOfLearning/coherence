@@ -12,4 +12,4 @@ import_config "#{Mix.env}.exs"
 # Eg. `test.more.exs`
 # Note `*.secret.exs` has been added to .gitignore
 # so `test.secret.exs` will not be checked in
-import_config "#{Mix.env}*.exs"
+import_config "#{Mix.env}.*.exs"
