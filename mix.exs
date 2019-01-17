@@ -25,7 +25,7 @@ defmodule Coherence.Mixfile do
   # Configuration for the OTP application
   def application do
     [mod: {Coherence, []},
-     applications: [:logger, :comeonin, :ecto, :uuid, :phoenix_swoosh,
+     applications: [:logger, :comeonin, :ecto_sql, :uuid, :phoenix_swoosh,
                     :tzdata, :plug, :phoenix, :phoenix_html]]
   end
 
@@ -34,21 +34,22 @@ defmodule Coherence.Mixfile do
 
   defp deps do
     [
-      {:ecto, "~> 2.0"},
+      {:ecto_sql, "~> 3.0"},
       {:comeonin, "~> 3.0"},
-      {:phoenix, "~> 1.3"},
-      {:phoenix_html, "~> 2.10"},
+      {:phoenix, "~> 1.4"},
+      {:phoenix_html, "~> 2.12"},
       {:gettext, "~> 0.13"},
       {:uuid, "~> 1.0"},
       {:phoenix_swoosh, "~> 0.2"},
       {:timex, "~> 3.4"},
-      {:plug, "~> 1.7"},
       {:floki, "~> 0.8", only: :test},
       {:ex_doc, "~> 0.16", only: :dev},
       {:earmark, "~> 1.2", only: :dev, override: true},
-      {:postgrex, ">= 0.0.0", only: :test},
+      {:postgrex, "~> 0.14.0", only: :test},
       {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test]},
+      {:plug, "~> 1.7.1"},
+      {:jason, "~> 1.0"}
     ]
   end
 

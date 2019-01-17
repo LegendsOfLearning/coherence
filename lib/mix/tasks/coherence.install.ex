@@ -567,7 +567,7 @@ defmodule Mix.Tasks.Coherence.Install do
       case config[:migration_path] do
         path when is_binary(path) -> path
         _ ->
-          Path.relative_to(migrations_path(repo), Mix.Project.app_path)
+          Path.relative_to(Ecto.Migrator.migrations_path(repo), Mix.Project.app_path)
       end
     file = Path.join(path, "#{current_timestamp}_#{underscore(name)}.exs")
     fun.(repo, path, file, name)

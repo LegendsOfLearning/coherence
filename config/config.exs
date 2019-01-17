@@ -2,6 +2,8 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :phoenix, :json_library, Jason
+
 config :coherence, Coherence.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: ""
