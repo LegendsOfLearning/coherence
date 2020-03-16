@@ -4,13 +4,14 @@ defmodule Coherence.Mixfile do
   @version "0.5.0"
 
   def project do
-    [ app: :coherence,
+    [
+      app: :coherence,
       version: @version,
       elixir: "~> 1.7",
-      elixirc_paths: elixirc_paths(Mix.env),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers,
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       docs: [extras: ["README.md"], main: "Coherence"],
       deps: deps(),
       package: package(),
@@ -24,17 +25,29 @@ defmodule Coherence.Mixfile do
 
   # Configuration for the OTP application
   def application do
-    [mod: {Coherence, []},
-     applications: [:logger, :comeonin, :ecto_sql, :uuid, :phoenix_swoosh,
-                    :tzdata, :plug, :phoenix, :phoenix_html]]
+    [
+      mod: {Coherence, []},
+      applications: [
+        :logger,
+        :comeonin,
+        :ecto_sql,
+        :uuid,
+        :phoenix_swoosh,
+        :tzdata,
+        :plug,
+        :phoenix,
+        :phoenix_html
+      ]
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
-  defp elixirc_paths(_),     do: ["lib", "web"]
+  defp elixirc_paths(_), do: ["lib", "web"]
 
   defp deps do
     [
-      {:ecto_sql, "~> 3.0"},
+      {:postgrex, "~> 0.15.0", only: :test},
+      {:ecto_sql, "~> 3.3"},
       {:comeonin, "~> 3.0"},
       {:phoenix, "~> 1.4"},
       {:phoenix_html, "~> 2.12"},
@@ -45,18 +58,19 @@ defmodule Coherence.Mixfile do
       {:floki, "~> 0.8", only: :test},
       {:ex_doc, "~> 0.16", only: :dev},
       {:earmark, "~> 1.2", only: :dev, override: true},
-      {:postgrex, "~> 0.14.0", only: :test},
       {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test]},
-      {:plug, "~> 1.7.1"},
+      {:plug, "~> 1.8"},
       {:jason, "~> 1.0"}
     ]
   end
 
   defp package do
-    [ maintainers: ["Stephen Pallen"],
+    [
+      maintainers: ["Stephen Pallen"],
       licenses: ["MIT"],
-      links: %{ "Github" => "https://github.com/smpallen99/coherence" },
-      files: ~w(lib priv README.md mix.exs LICENSE)]
+      links: %{"Github" => "https://github.com/smpallen99/coherence"},
+      files: ~w(lib priv README.md mix.exs LICENSE)
+    ]
   end
 end
