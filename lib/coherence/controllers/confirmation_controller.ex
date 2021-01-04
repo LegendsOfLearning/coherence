@@ -75,7 +75,7 @@ defmodule Coherence.ConfirmationController do
 
     case user do
       nil ->
-        changeset = Helpers.changeset :confirmation, user_schema, user_schema.__struct__
+        _changeset = Helpers.changeset :confirmation, user_schema, user_schema.__struct__
         conn
         |> put_flash(:error, Messages.backend().invalid_confirmation_token())
         |> redirect_to(:confirmation_edit_invalid, params)

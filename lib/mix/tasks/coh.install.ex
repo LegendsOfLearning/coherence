@@ -380,7 +380,7 @@ defmodule Mix.Tasks.Coh.Install do
 
   defp get_compiled_model(%{user_schema: user_schema} = config) do
     user_schema = Module.concat user_schema, nil
-    Map.put(config, :model_found?, Code.ensure_compiled?(user_schema))
+    Map.put(config, :model_found?, Code.ensure_compiled(user_schema))
   end
 
   def find_existing_model(%{model_found?: false, user_schema: user_schema} = config, path) do
@@ -1158,8 +1158,8 @@ defmodule Mix.Tasks.Coh.Install do
     opts_bin = Enum.uniq(opts_bin)
     opts_names = Enum.map opts, &(elem(&1, 0))
 
-    with  [] <- Enum.filter(opts_bin, &(not &1 in @switch_names)),
-          [] <- Enum.filter(opts_names, &(not &1 in @switch_names)) do
+    with  [] <- Enum.filter(opts_bin, &(&1 not in @switch_names)),
+          [] <- Enum.filter(opts_names, &(&1 not in @switch_names)) do
       {opts_bin, opts}
     else
       list -> raise_option_errors(list)

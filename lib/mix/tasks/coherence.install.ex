@@ -368,7 +368,7 @@ defmodule Mix.Tasks.Coherence.Install do
   defp check_for_model(%{user_schema: user_schema} = config) do
     user_schema = Module.concat user_schema, nil
     Map.put(config,
-      :model_found?, Code.ensure_compiled?(user_schema) or
+      :model_found?, Code.ensure_compiled(user_schema) or
       model_exists?(user_schema, "web/models"))
   end
 
@@ -1101,8 +1101,8 @@ defmodule Mix.Tasks.Coherence.Install do
     opts_bin = Enum.uniq(opts_bin)
     opts_names = Enum.map opts, &(elem(&1, 0))
 
-    with  [] <- Enum.filter(opts_bin, &(not &1 in @switch_names)),
-          [] <- Enum.filter(opts_names, &(not &1 in @switch_names)) do
+    with  [] <- Enum.filter(opts_bin, &(&1 not in @switch_names)),
+          [] <- Enum.filter(opts_names, &(&1 not in @switch_names)) do
       {opts_bin, opts}
     else
       list -> raise_option_errors(list)

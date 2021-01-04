@@ -27,16 +27,18 @@ defmodule Coherence.Mixfile do
   def application do
     [
       mod: {Coherence, []},
-      applications: [
+      extra_applications: [
         :logger,
         :comeonin,
         :ecto_sql,
         :uuid,
         :phoenix_swoosh,
+        :timex,
         :tzdata,
         :plug,
         :phoenix,
-        :phoenix_html
+        :phoenix_html,
+        :xmerl
       ]
     ]
   end
@@ -46,21 +48,21 @@ defmodule Coherence.Mixfile do
 
   defp deps do
     [
-      {:postgrex, "~> 0.15.0", only: :test},
-      {:ecto_sql, "~> 3.3"},
+      {:postgrex, ">= 0.0.0", only: :test},
+      {:ecto_sql, "~> 3.5.3"},
       {:comeonin, "~> 3.0"},
-      {:phoenix, "~> 1.4"},
-      {:phoenix_html, "~> 2.12"},
-      {:gettext, "~> 0.13"},
+      {:phoenix, "~> 1.5.7"},
+      {:phoenix_html, "~> 2.13"},
+      {:gettext, "~> 0.14"},
       {:uuid, "~> 1.0"},
       {:phoenix_swoosh, "~> 0.2"},
-      {:timex, "~> 3.4"},
+      {:timex, "~> 3.6.3"},
       {:floki, "~> 0.8", only: :test},
       {:ex_doc, "~> 0.16", only: :dev},
       {:earmark, "~> 1.2", only: :dev, override: true},
       {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test]},
-      {:plug, "~> 1.8"},
+      {:plug, "~> 1.10"},
       {:jason, "~> 1.0"}
     ]
   end

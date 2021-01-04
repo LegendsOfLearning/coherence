@@ -367,7 +367,7 @@ defmodule Mix.Tasks.Coh.Clean do
 
     switch_keys = Keyword.keys @switches
 
-    case opts |> Keyword.keys |> Enum.filter(&(not &1 in switch_keys)) do
+    case opts |> Keyword.keys |> Enum.filter(&(&1 not in switch_keys)) do
       [] -> opts
       list -> raise_option_errors(list)
     end
