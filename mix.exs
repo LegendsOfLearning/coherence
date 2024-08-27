@@ -7,7 +7,7 @@ defmodule Coherence.Mixfile do
     [
       app: :coherence,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.17.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix] ++ Mix.compilers(),
       build_embedded: Mix.env() == :prod,
@@ -52,7 +52,7 @@ defmodule Coherence.Mixfile do
       {:ecto_sql, "~> 3.12.0"},
       {:comeonin, "~> 3.0"},
       {:phoenix, "~> 1.6.10"},
-      {:phoenix_html, "~> 2.13"},
+      {:phoenix_html, "~> 2.2"},
       {:gettext, "~> 0.26.1"},
       {:elixir_uuid, "~> 1.2"},
       {:phoenix_swoosh, "~> 0.3.2"},
