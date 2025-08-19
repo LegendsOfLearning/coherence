@@ -49,7 +49,7 @@ defmodule Coherence.Mixfile do
   defp deps do
     [
       {:postgrex, ">= 0.0.0", only: :test},
-      {:ecto_sql, "~> 3.12.0"},
+      {:ecto_sql, "~> 3.13.0"},
       {:comeonin, "~> 3.0"},
       {:phoenix, "~> 1.6.10"},
       {:phoenix_html, "~> 2.2"},
